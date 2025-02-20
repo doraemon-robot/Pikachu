@@ -1,0 +1,235 @@
+SQL> select * from employee;
+
+    EMP_ID  BRANCH_ID EMP_NAME             EMP_DOB      EMP_AGE EMP_STDAT    EMP_LOE EMP_DOORNO EMP_STREET           EMP_CITY   EMP_PINCOD EMP_SALARY
+---------- ---------- -------------------- --------- ---------- --------- ---------- ---------- -------------------- ---------- ---------- ----------
+         5        903 RAVI                 15-MAR-95         30 10-JAN-23          2 A/12       GANDHI STREET        VNR        620006          21000
+         2        901 NAVEEN               11-JUN-89         35 12-NOV-19          5 H/43       KANMANI STREET       VNR        620006          20000
+         6        903 ARUN                 05-NOV-96         29 05-MAY-21          4 B/45       NEHRU STREET         MADURAI    620005          22000
+         1        901 AK                   01-JUN-05         19 22-AUG-23          1 L/308      TNHB STREET          MADURAI    620005          15000
+         4        902 SACHIN               20-FEB-00         25 20-FEB-20          5 S/22       KANMANI STREET       SVKS       626005          20000
+         3        901 MOHAN                21-APR-00         24 17-MAR-22          2 G/33       VANNAN STREET        VNR        620006          17000
+         7        903 KUMAR                12-DEC-93         32 01-JAN-20          5 C/89       ANNA STREET          SVKS       626005          23000
+         8        902 RAJ                  25-JUL-94         31 15-FEB-22          3 D/67       PERIYAR STREET       SVKS       626005          24000
+         9        902 ANAND                18-OCT-92         33 20-SEP-23          1 E/56       KAMARAJ STREET       VNR        620006          25000
+        10        904 VIJAY                30-JAN-91         34 25-MAR-21          4 F/23       TAGORE STREET        MADURAI    620005          26000
+
+10 rows selected.
+
+SQL> SELECT EMP_NAME, EMP_AGE FROM EMPLOYEE WHERE EMP_AGE = (SELECT MAX(EMP_AGE) FROM EMPLOYEE);
+
+EMP_NAME                EMP_AGE
+-------------------- ----------
+NAVEEN                       35
+m
+SQL> SELECT EMP_NAME, EMP_AGE FROM EMPLOYEE WHERE EMP_AGE > (SELECT AVG(EMP_AGE) FROM EMPLOYEE);
+
+EMP_NAME                EMP_AGE
+-------------------- ----------
+RAVI                         30
+NAVEEN                       35
+KUMAR                        32
+RAJ                          31
+ANAND                        33
+VIJAY                        34
+
+6 rows selected.
+
+SQL> SELECT EMP_NAME, EMP_CITY FROM EMPLOYEE WHERE EMP_CITY IN (SELECT EMP_CITY FROM EMPLOYEE WHERE EMP_AGE >= 35);
+
+EMP_NAME             EMP_CITY
+-------------------- ----------
+RAVI                 VNR
+NAVEEN               VNR
+MOHAN                VNR
+ANAND                VNR
+
+SQL> SELECT EMP_NAME, EMP_CITY FROM EMPLOYEE WHERE EMP_CITY IN (SELECT EMP_CITY FROM EMPLOYEE WHERE EMP_NAME = 'RAJ');
+
+EMP_NAME             EMP_CITY
+-------------------- ----------
+SACHIN               SVKS
+KUMAR                SVKS
+RAJ                  SVKS
+
+SQL> SELECT EMP_NAME, EMP_AGE FROM EMPLOYEE WHERE EMP_AGE < ANY (SELECT EMP_AGE FROM EMPLOYEE WHERE EMP_AGE > 30);
+
+EMP_NAME                EMP_AGE
+-------------------- ----------
+RAVI                         30
+ARUN                         29
+AK                           19
+SACHIN                       25
+MOHAN                        24
+KUMAR                        32
+RAJ                          31
+ANAND                        33
+VIJAY                        34
+
+9 rows selected.
+
+SQL> SELECT EMP_NAME, EMP_AGE FROM EMPLOYEE WHERE EMP_AGE < ALL (SELECT EMP_AGE FROM EMPLOYEE WHERE EMP_AGE > 30);
+
+EMP_NAME                EMP_AGE
+-------------------- ----------
+RAVI                         30
+ARUN                         29
+SACHIN                       25
+MOHAN                        24
+AK                           19
+
+5 rows selected.
+
+SQL>  SELECT EMP_NAME, EMP_AGE FROM EMPLOYEE WHERE EMP_AGE > ALL (SELECT EMP_AGE FROM EMPLOYEE WHERE EMP_AGE < 30);
+
+EMP_NAME                EMP_AGE
+-------------------- ----------
+RAVI                         30
+RAJ                          31
+KUMAR                        32
+ANAND                        33
+VIJAY                        34
+NAVEEN                       35
+
+6 rows selected.
+
+SQL> SELECT E1.EMP_NAME, E1.EMP_CITY FROM EMPLOYEE E1 WHERE (E1.EMP_CITY) IN (SELECT E2.EMP_CITY FROM EMPLOYEE E2 WHERE E2.EMP_NAME = 'AK');
+
+EMP_NAME             EMP_CITY
+-------------------- ----------
+ARUN                 MADURAI
+AK                   MADURAI
+VIJAY                MADURAI
+
+3 rows selected.
+
+SQL> SELECT E1.EMP_NAME, E1.EMP_CITY, E1.BRANCH_ID FROM EMPLOYEE E1 WHERE (E1.EMP_CITY, E1.BRANCH_ID) IN (SELECT B1.BRANCH_CITY, B1.BRANCH_ID FROM BRANCH B1
+ WHERE E1.EMP_CITY = B1.BRANCH_CITY);
+
+EMP_NAME             EMP_CITY    BRANCH_ID
+-------------------- ---------- ----------
+ANAND                VNR               902
+
+SQL> SELECT EMP_CITY, COUNT(*) AS NUM_EMPLOYEES FROM (SELECT EMP_CITY FROM EMPLOYEE) E GROUP BY EMP_CITY;
+
+EMP_CITY   NUM_EMPLOYEES
+---------- -------------
+VNR                    4
+MADURAI                3
+SVKS                   3
+
+SQL> SELECT E1.EMP_NAME, E1.EMP_CITY, E1.EMP_AGE,(SELECT TRUNC(AVG(EMP_AGE)) FROM EMPLOYEE E2 WHERE E2.EMP_CITY = E1.EMP_CITY) AS AVG_CITY_AGE FROM EMPLOYEE E1;
+
+EMP_NAME             EMP_CITY      EMP_AGE AVG_CITY_AGE
+-------------------- ---------- ---------- ------------
+RAVI                 VNR                30           30
+NAVEEN               VNR                35           30
+MOHAN                VNR                24           30
+ANAND                VNR                33           30
+ARUN                 MADURAI            29           27
+AK                   MADURAI            19           27
+VIJAY                MADURAI            34           27
+SACHIN               SVKS               25           29
+KUMAR                SVKS               32           29
+RAJ                  SVKS               31           29
+
+10 rows selected.
+
+SQL> SELECT EMP_CITY, TRUNC(AVG(EMP_AGE)) AS AVG_AGE FROM EMPLOYEE GROUP BY EMP_CITY HAVING AVG(EMP_AGE) > (SELECT AVG(EMP_AGE) FROM EMPLOYEE);
+
+EMP_CITY      AVG_AGE
+---------- ----------
+VNR                30
+SVKS               29
+
+SQL> SELECT E1.EMP_NAME, E1.EMP_CITY FROM EMPLOYEE E1 WHERE EXISTS (SELECT 1 FROM EMPLOYEE E2 WHERE E1.EMP_CITY = E2.EMP_CITY AND E1.EMP_NAME != E2.EMP_NAME);
+
+EMP_NAME             EMP_CITY
+-------------------- ----------
+NAVEEN               VNR
+MOHAN                VNR
+ANAND                VNR
+RAVI                 VNR
+AK                   MADURAI
+VIJAY                MADURAI
+ARUN                 MADURAI
+KUMAR                SVKS
+RAJ                  SVKS
+SACHIN               SVKS
+
+10 rows selected.
+
+SQL> WITH AvgAge AS (SELECT TRUNC(AVG(EMP_AGE)) AS avg_age FROM EMPLOYEE) SELECT EMP_NAME, EMP_AGE FROM EMPLOYEE WHERE EMP_AGE > (SELECT avg_age FROM AvgAge);
+
+EMP_NAME                EMP_AGE
+-------------------- ----------
+RAVI                         30
+NAVEEN                       35
+KUMAR                        32
+RAJ                          31
+ANAND                        33
+VIJAY                        34
+
+6 rows selected.
+
+SQL> WITH AvgAge AS (
+  2        SELECT AVG(EMP_AGE) AS avg_age
+  3        FROM EMPLOYEE
+  4      ),
+  5      CityCount AS (
+  6        SELECT EMP_CITY, COUNT(*) AS city_count
+  7        FROM EMPLOYEE
+  8        GROUP BY EMP_CITY
+  9      )
+ 10     SELECT E1.EMP_NAME, E1.EMP_AGE, E2.EMP_CITY, E2.city_count
+ 11     FROM EMPLOYEE E1
+ 12     JOIN CityCount E2 ON E1.EMP_CITY = E2.EMP_CITY
+ 13     WHERE E1.EMP_AGE > (SELECT avg_age FROM AvgAge)
+ 14       AND E2.city_count > 2;
+
+EMP_NAME                EMP_AGE EMP_CITY   CITY_COUNT
+-------------------- ---------- ---------- ----------
+RAVI                         30 VNR                 4
+NAVEEN                       35 VNR                 4
+ANAND                        33 VNR                 4
+VIJAY                        34 MADURAI             3
+KUMAR                        32 SVKS                3
+RAJ                          31 SVKS                3
+
+6 rows selected.
+
+SQL> SELECT EMP_NAME, (SELECT EMP_NAME FROM employee WHERE EMP_ID = 1) AS SUPERVISOR_NAME
+  2  FROM employee
+  3  WHERE EMP_CITY = 'MADURAI';
+
+EMP_NAME             SUPERVISOR_NAME
+-------------------- --------------------
+ARUN                 AK
+AK                   AK
+VIJAY                AK
+
+SQL> SELECT EMP_NAME, (SELECT EMP_NAME FROM employee WHERE EMP_ID = 2) AS SUPERVISOR_NAME
+  2  FROM employee
+  3  WHERE EMP_CITY = 'VNR';
+
+EMP_NAME             SUPERVISOR_NAME
+-------------------- --------------------
+RAVI                 NAVEEN
+NAVEEN               NAVEEN
+MOHAN                NAVEEN
+ANAND                NAVEEN
+
+SQL> SELECT EMP_NAME, EMP_AGE
+  2  FROM employee
+  3  WHERE EMP_AGE > (SELECT AVG(EMP_AGE) FROM employee);
+
+EMP_NAME                EMP_AGE
+-------------------- ----------
+RAVI                         30
+NAVEEN                       35
+KUMAR                        32
+RAJ                          31
+ANAND                        33
+VIJAY                        34
+
+6 rows selected.
+
