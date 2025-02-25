@@ -1,0 +1,135 @@
+1.12
+2.3
+3.2
+4.1
+5.2
+6.3
+7.1
+8.4
+9.4->1
+10.5
+
+
+from collections import deque
+
+def calculate_total_amount(p, r, t):
+    return p + (p * r * t) // 100
+
+def count_ways_to_collect_amount(tree, target_amount):
+    n = len(tree)
+    ways = 0
+    def dfs(index, current_sum):
+        nonlocal ways
+        if index >= n or tree[index] == -1:
+            return
+        current_sum += tree[index]
+        if current_sum == target_amount:
+            ways += 1
+        dfs(2 * index + 1, current_sum)
+        dfs(2 * index + 2, current_sum)
+    
+    for i in range(n):
+        if tree[i] != -1:
+            dfs(i, 0)
+    
+    return ways
+
+def main():
+    import sys
+    input = sys.stdin.read
+    data = input().split()
+    
+    t = int(data[0])
+    index = 1
+    
+    results = []
+    for _ in range(t):
+        n = int(data[index])
+        p = int(data[index + 1])
+        r = int(data[index + 2])
+        t = int(data[index + 3])
+        tree = list(map(int, data[index + 4: index + 4 + n]))
+        index += 4 + n
+        
+        total_amount = calculate_total_amount(p, r, t)
+        ways = count_ways_to_collect_amount(tree, total_amount)
+        results.append(ways)
+    
+    for result in results:
+        print(result)
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from collections import deque
+
+def get_neighbors(code):
+    neighbors = []
+    for i in range(4):
+        digit = int(code[i])
+        for move in [-1, 1]:
+            new_digit = (digit + move) % 10
+            new_code = code[:i] + str(new_digit) + code[i+1:]
+            neighbors.append(new_code)
+    return neighbors
+
+def min_rotations_to_disarm(disarm_code, failsafe):
+    if disarm_code == "0000":
+        return 0
+
+    visited = set(failsafe)
+    if "0000" in visited:
+        return -1
+
+    queue = deque([("0000", 0)])
+    visited.add("0000")
+
+    while queue:
+        current_code, rotations = queue.popleft()
+        for neighbor in get_neighbors(current_code):
+            if neighbor == disarm_code:
+                return rotations + 1
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append((neighbor, rotations + 1))
+    return -1
+
+def main():
+    import sys
+    input = sys.stdin.read
+    data = input().split()
+    
+    index = 0
+    t = int(data[index])
+    index += 1
+    
+    results = []
+    for _ in range(t):
+        disarm_code = data[index]
+        index += 1
+        n = int(data[index])
+        index += 1
+        failsafe = set(data[index:index + n])
+        index += n
+        
+        result = min_rotations_to_disarm(disarm_code, failsafe)
+        results.append(result)
+    
+    for result in results:
+        print(result)
+
+if __name__ == "__main__":
+    main()
