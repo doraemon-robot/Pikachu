@@ -1,0 +1,137 @@
+1.3
+2.2,3
+3.21
+4.-1
+5.2
+6.2
+7.2
+
+1//
+
+import sys
+import heapq
+
+def main():
+    input = sys.stdin.read
+    data = input().split()
+    idx = 0
+    t = int(data[idx])
+    idx += 1
+    results = []
+    
+    for _ in range(t):
+        n = int(data[idx])
+        a = int(data[idx+1])
+        x = int(data[idx+2])
+        idx += 3
+        
+        # Build adjacency list
+        graph = [[] for _ in range(n)]
+        for _ in range(a):
+            u = int(data[idx])
+            v = int(data[idx+1])
+            w = int(data[idx+2])
+            graph[u].append((v, w))
+            graph[v].append((u, w))
+            idx += 3
+        
+        max_compromised = -1
+        best_system = -1
+        
+        # For each system, simulate the update propagation
+        for start in range(n):
+            # Dijkstra's algorithm to compute the shortest time to each system
+            dist = [float('inf')] * n
+            dist[start] = 0
+            heap = [(0, start)]
+            
+            while heap:
+                current_dist, u = heapq.heappop(heap)
+                if current_dist > dist[u]:
+                    continue
+                for v, w in graph[u]:
+                    if dist[v] > dist[u] + w:
+                        dist[v] = dist[u] + w
+                        heapq.heappush(heap, (dist[v], v))
+            
+            # Count the number of systems that cannot be updated within time x
+            compromised = 0
+            for d in dist:
+                if d > x:
+                    compromised += 1
+            
+            # Update the best system
+            if compromised > max_compromised or (compromised == max_compromised and start > best_system):
+                max_compromised = compromised
+                best_system = start
+        
+        results.append(best_system)
+    
+    for result in results:
+        print(result)
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+2//
+from collections import deque
+
+# Precompute primes up to 99999 using the Sieve of Eratosthenes
+MAX_PIN = 100000
+is_prime = [True] * MAX_PIN
+is_prime[0] = is_prime[1] = False  # 0 and 1 are not prime numbers
+for i in range(2, int(MAX_PIN ** 0.5) + 1):
+    if is_prime[i]:
+        for j in range(i * i, MAX_PIN, i):
+            is_prime[j] = False
+
+# BFS to compute the minimum cost
+def min_cost_to_update_pin(A, B):
+    # Early exit if A or B is already prime
+    if is_prime[A] or is_prime[B]:
+        return -1
+    
+    # Queue for BFS
+    queue = deque([(A, A)])  # (current PIN, total cost so far)
+    visited = [False] * MAX_PIN
+    visited[A] = True
+    
+    while queue:
+        current, total_cost = queue.popleft()
+        
+        # If we've reached the target pin
+        if current == B:
+            return total_cost
+        
+        # Generate the next possible PINs by modifying each digit
+        current_str = str(current)
+        for i in range(len(current_str)):
+            digit = int(current_str[i])
+            
+            # Try to increase the digit if it's not 9
+            if digit < 9:
+                new_pin = current + 10**(len(current_str)-i-1)
+                if new_pin < MAX_PIN and not visited[new_pin] and not is_prime[new_pin]:
+                    visited[new_pin] = True
+                    queue.append((new_pin, total_cost + new_pin))
+            
+            # Try to decrease the digit if it's not 0
+            if digit > 0:
+                new_pin = current - 10**(len(current_str)-i-1)
+                if new_pin < MAX_PIN and not visited[new_pin] and not is_prime[new_pin]:
+                    visited[new_pin] = True
+                    queue.append((new_pin, total_cost + new_pin))
+    
+    return -1
+
+def solve():
+    t = int(input())  # number of test cases
+    for _ in range(t):
+        A, B = map(int, input().split())
+        print(min_cost_to_update_pin(A, B))
+
+# Run the solution
+solve()
