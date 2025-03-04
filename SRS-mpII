@@ -1,0 +1,126 @@
+APPOINTMENT BOOKING SYSTEM
+1.INTRODUCTION
+Purpose 
+Online Doctor Appointment is a smart web application. This provides a registration and login for both doctors and users. Doctors can register by giving his necessary details like timings, fee, etc. After successful registration, the doctor can log in by giving username and password. The doctor can view the booking request by users and if he accepts the users requests the status will be shown as booking confirmed to the users. He can also view the feedback given by the users. The users must be registered and log in to book a doctor. The search results will show the list of doctors matching users required criteria and he can select one and send a request. The request will be forwarded to admin and admin forward it to doctor and if he is available, he will send the confirmation, it updates the booking request and says confirmed to the users. The users can view the status in the status tab.
+System Overview
+There are three Main Module in this appointment booking system. They are:
+I. Admin:
+Admin needs to login with username and password and in the admin home screen, he can see the basic functionalities of admin. Admin can add doctors and view doctor. He can also view the user’s request. Admin can view the appointment and view feedback of users. Admin can able to control the whole system. He/she can add, delete, update and modify the system. Admin keeps the system up-to-date.
+II. Doctor:
+Doctor needs to be registered by giving the necessary details like experience, timing, fees etc. After registering, he needs to log in and in the home screen he can view the basic functionalities. Doctors are able to see the respective appointments taken. Doctor should fairly know about the usage of the system. He can view and accept the user request.
+III. Users:
+The user needs to be registered and log in after logging on he can search for the doctor by giving the location. Based on the doctor availability, the booking request will be confirmed. He can also view in the status and he can also give feedback biasing the performance of the doctor.
+
+2.Tools/ Environment used
+HardwareProcessor :
+ Pentium 2.4 GHz or above.
+Memory :
+ 256 MB RAM or above.
+Catch Memory:
+ 128 KB or above.
+Hard disk :
+ At least 3GB or above [At least 3 GB free space is required]
+SoftwareOperating System:
+ windows xp, windows 7.
+Front end tool :
+ HTML, JavaScript, css.
+Back end:
+MangoDB
+.
+
+
+3.
+ 
+Online Appointment Overview
+a)
+ 
+Home Page
+It shows the basic view of the application home page and the list of modules.
+ 
+b)
+ 
+Admin Login Page
+In this page, admin can log in by giving username and password. After successfullogin, the application shows the admin home page in which the basic functionalitiesare shown.
+
+c)
+ 
+Add/Delete/Update/Modify records
+ Admin can add doctor, view doctor, view users, view appointmaent, view feedback .
+I.
+ 
+Add Doctor:
+Admin can add doctor details like doc id, name, address, mobile number, email,category. Fig: Add doctor
+II.
+ 
+View Doctor:
+Admin can view doctor list.
+
+III.
+ 
+View users:
+Admin can view users details like name, email, phone, gender, age, address.
+IV.
+ 
+View Appointment:
+Admin can view appointment like user id, doctor name, appointment date,appointment time.
+V.
+ 
+View Feedback:
+Admin can view feedback details like users id,Feedback (Good,Bad), date
+
+
+VI.
+ 
+Add Walk-In Users:
+Admin can add walk-in users and adjust users according to online appointmentusers.
+Add Walk-In UsersName Email-Id Phone Gender Age Address Time
+Abc abc@gmail.com 9876543210 female 24 pune 9-9:30pm
+d)
+ 
+Users Details:
+In user details, first users registered for online appointment, after registration process user login with username and password. User can book onlineappointment, view booking, cancel booking , search doctor ,give feedback .
+I.
+ 
+Users registration process:
+In this page, the users can register into the application by providing all necessarydetails.
+ II.
+ 
+Users login:
+User login with username and password for online appointment
+
+III.
+ 
+Book Appointment:
+User book appointment with appointment Id, category(which type ofsonophraphy test), select doctor, select date, select time, select payment options.
+IV.
+ 
+Cancel booking:
+User can cancel online booking appointment
+
+
+V.
+ 
+View booking:
+Users can view booking history.
+VI.
+ 
+Feedback:
+Users can give the feedback.
+d)
+ 
+Doctor details:
+Doctor login with user-id and password, he/she can view appointment details, viewusers details.
+I.
+ 
+Doctor login:
+Doctor login with username and password.
+II.
+ 
+My appointment:
+Doctor view appointments details.
+ 
+
+III.
+ 
+View users details:
+Doctor can view users details.
