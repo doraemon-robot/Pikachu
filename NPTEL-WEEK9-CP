@@ -1,0 +1,97 @@
+1.2
+2.1
+3.4
+4.1
+5.1,2,5
+6.4
+7.4
+8.1
+
+
+import sys
+import math
+from heapq import heappop, heappush
+
+def can_distribute_food_within_time(N, M, K, pathways, clusters, speeds, max_time):
+    # Create a graph where we will keep track of possible clusters that can be reached within max_time
+    graph = [[] for _ in range(N)]
+    
+    for i in range(N):
+        x1, y1 = pathways[i]
+        Si = speeds[i]
+        
+        for j in range(M):
+            x2, y2 = clusters[j]
+            # Calculate the time taken to reach the j-th cluster from the i-th pathway
+            time_to_reach = math.ceil(((x2 - x1) ** 2 + (y2 - y1) ** 2) / (Si ** 2))
+            if time_to_reach * 60 <= max_time:  # convert time to seconds
+                graph[i].append(j)
+        
+    # Now we need to see if we can cover at least K clusters
+    # We will use a max-heap to keep track of how many clusters we can reach
+    reached_clusters = [0] * M
+    
+    for i in range(N):
+        for j in graph[i]:
+            reached_clusters[j] += 1
+            
+    # Count how many clusters reached
+    total_reached = sum(1 for count in reached_clusters if count > 0)
+    
+    return total_reached >= K
+
+def min_time_to_distribute_food(N, M, K, pathways, clusters, speeds):
+    # Binary search over time
+    left = 0  # minimum time (0 seconds)
+    right = int(1e9)  # a large enough time threshold (to be adjusted)
+    
+    while left < right:
+        mid = (left + right) // 2
+        if can_distribute_food_within_time(N, M, K, pathways, clusters, speeds, mid):
+            right = mid  # Try for smaller time
+        else:
+            left = mid + 1  # Need more time
+    
+    # Check if we managed to find a valid distribution
+    if left == int(1e9):
+        return -1
+    return left
+
+def main():
+    input = sys.stdin.read
+    data = input().splitlines()
+    
+    index = 0
+    t = int(data[index])
+    index += 1
+    results = []
+    
+    for _ in range(t):
+        N, M, K = map(int, data[index].split())
+        index += 1
+        
+        pathways = []
+        for _ in range(N):
+            x, y = map(int, data[index].split())
+            pathways.append((x, y))
+            index += 1
+            
+        clusters = []
+        for _ in range(M):
+            p, q = map(int, data[index].split())
+            clusters.append((p, q))
+            index += 1
+            
+        speeds = list(map(int, data[index].split()))
+        index += 1
+        
+        # Calculate the minimum time required
+        result = min_time_to_distribute_food(N, M, K, pathways, clusters, speeds)
+        results.append(result)
+    
+    for result in results:
+        print(result)
+if __name__ == "__main__":
+    main()
+
+
