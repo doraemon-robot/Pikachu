@@ -1,0 +1,102 @@
+1.2
+2.4
+3.3
+4.3
+5.4
+6.3
+7.19
+
+
+
+
+1//
+def max_points_percentage(t, test_cases):
+    results = []
+    
+    for test in test_cases:
+        n, points = test
+        total_points = sum(points)
+        
+        # dp[i] will store the maximum points we can get from index i to end
+        dp = [0] * (n + 1)
+        
+        for i in range(n - 1, -1, -1):
+            if i == n - 1:
+                dp[i] = points[i]
+            elif i == n - 2:
+                dp[i] = max(points[i], points[i + 1])
+            else:
+                dp[i] = max(points[i] + dp[i + 2], dp[i + 1])
+        
+        max_points = dp[0]
+        percentage = (max_points / total_points) * 100
+        results.append(f"{percentage:.2f}%")
+    
+    return results
+
+if __name__ == "__main__":
+    import sys
+    input = sys.stdin.read
+    data = input().split()
+    
+    t = int(data[0])
+    index = 1
+    test_cases = []
+    
+    for _ in range(t):
+        n = int(data[index])
+        points = list(map(int, data[index + 1:index + 1 + n]))
+        test_cases.append((n, points))
+        index += n + 1
+    
+    results = max_points_percentage(t, test_cases)
+    
+    for result in results:
+        print(result)
+
+
+
+2//
+def count_valid_configurations(t, test_cases):
+    results = []
+    
+    for target, n, coefficients in test_cases:
+        total_sum = sum(coefficients)
+        if (total_sum < target) or ((total_sum + target) % 2 != 0):
+            results.append(0)
+            continue
+        
+        subset_sum = (total_sum + target) // 2
+        
+        # Use dynamic programming to count the number of ways to achieve subset_sum
+        dp = [0] * (subset_sum + 1)
+        dp[0] = 1  # There's exactly one way to have a subset sum of 0 (empty subset)
+        
+        for coef in coefficients:
+            for j in range(subset_sum, coef - 1, -1):
+                dp[j] += dp[j - coef]
+        
+        results.append(dp[subset_sum])
+    
+    return results
+
+if __name__ == "__main__":
+    import sys
+    input = sys.stdin.read
+    data = input().split()
+    
+    t = int(data[0])
+    index = 1
+    test_cases = []
+    
+    for _ in range(t):
+        target = int(data[index])
+        n = int(data[index + 1])
+        coefficients = list(map(int, data[index + 2:index + 2 + n]))
+        test_cases.append((target, n, coefficients))
+        index += 2 + n
+    
+    results = count_valid_configurations(t, test_cases)
+    
+    for result in results:
+        print(result)
