@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <string.h>
+
+#define MAX_VERTICES 100
+
+// Function to find the shortest augmenting path using BFS
+int shortestAugmentingPath(int n, int source, int sink, int capacity[MAX_VERTICES][MAX_VERTICES]) {
+    int flow[MAX_VERTICES][MAX_VERTICES] = {0}; // Flow matrix
+    int label[MAX_VERTICES];                   // Labels for vertices
+    int maxFlow = 0;
+
+    while (1) {
+        // Initialize labels and BFS queue
+        int Q[MAX_VERTICES], front = 0, rear = 0;
+        memset(label, -1, sizeof(label));
+        label[source] = INT_MAX; // Label the source with infinity
+        Q[rear++] = source;
+
+        // Perform BFS to find an augmenting path
+        while (front < rear) {
+            int i = Q[front++];
+            // Forward edges
+            for (int j = 0; j < n; j++) {
+                if (label[j] == -1 && capacity[i][j] - flow[i][j] > 0) { // If j is unlabeled and residual capacity > 0
+                    label[j] = (label[i] < capacity[i][j] - flow[i][j]) ? label[i] : (capacity[i][j] - flow[i][j]);
+                    Q[rear++] = j;
+                    if (j == sink) break; // Stop BFS if sink is labeled
+                }
+            }
+            // Backward edges
+            for (int j = 0; j < n; j++) {
+                if (label[j] == -1 && flow[j][i] > 0) { // If j is unlabeled and there is backward flow
+                    label[j] = (label[i] < flow[j][i]) ? label[i] : flow[j][i];
+                    Q[rear++] = j;
+                    if (j == sink) break; // Stop BFS if sink is labeled
+                }
+            }
+        }
+
+        // If the sink is not labeled, we are done
+        if (label[sink] == -1) break;
+
+        // Augment flow along the augmenting path
+        int j = sink;
+        while (j != source) {
+            for (int i = 0; i < n; i++) {
+                if (capacity[i][j] > 0 && label[j] == ((label[i] < capacity[i][j] - flow[i][j]) ? label[i] : (capacity[i][j] - flow[i][j]))) { // Forward edge
+                    flow[i][j] += label[sink];
+                    flow[j][i] -= label[sink];
+                    j = i;
+                    break;
+                } else if (flow[j][i] > 0 && label[j] == ((label[i] < flow[j][i]) ? label[i] : flow[j][i])) { // Backward edge
+                    flow[j][i] -= label[sink];
+                    flow[i][j] += label[sink];
+                    j = i;
+                    break;
+                }
+            }
+        }
+
+        // Update the total flow
+        maxFlow += label[sink];
+    }
+
+    return maxFlow;
+}
+
+int main() {
+    int vertices, edges;
+    int capacity[MAX_VERTICES][MAX_VERTICES] = {0};
+
+    printf("Enter the number of vertices and edges: ");
+    scanf("%d %d", &vertices, &edges);
+
+    printf("Enter the edges in the format: from to capacity\n");
+    for (int i = 0; i < edges; i++) {
+        int from, to, cap;
+        scanf("%d %d %d", &from, &to, &cap);
+        capacity[from][to] = cap;
+    }
+
+    int source, sink;
+    printf("Enter the source and sink vertices: ");
+    scanf("%d %d", &source, &sink);
+
+    int maxFlow = shortestAugmentingPath(vertices, source, sink, capacity);
+    printf("The maximum flow is: %d\n", maxFlow);
+
+    return 0;
+}
